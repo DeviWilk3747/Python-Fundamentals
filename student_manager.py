@@ -1,8 +1,21 @@
 # Stores all student records
 students = []
 
+# Rewrites the student file using the current students list
+def save_students():
+    file = open("student_manager.txt", "w")
+
+    for student in students:
+        file.write(f"{student['Name']}, {student['Major']}, {student['Graduation Year']}\n")
+    
+    file.close()
+
 # Loads students that may already exist
 def load_students():
+
+    # Resets memory
+    students.clear()
+
     file = open("student_manager.txt", "r")
 
     # Loops through lines in the file
@@ -23,7 +36,6 @@ def load_students():
 
     file.close()
     
-
 # Adds a new student to the system
 def add_students():
 
@@ -50,11 +62,9 @@ def add_students():
     
     # Add student dictionary to list
     students.append(new_student)
-    
-    # Opens file and stores the students in that file
-    file = open("student_manager.txt", "a")
-    file.write(f"{name}, {major}, {graduation_year}\n")
-    file.close()
+
+    # Saves student data to file
+    save_students()
 
 
     print("Student added successfully!\n")
@@ -86,7 +96,7 @@ def search_students():
     for student in students:
 
         # Compare student name with search input
-        if student["Name"] == search_name:
+        if student["Name"].lower() == search_name.lower():
 
             # Display matching studenyt information
             print("Name: ", student["Name"])
@@ -112,8 +122,9 @@ def delete_students():
     for student in students:
 
         # Removes matching student
-        if student["Name"] == delete_student:
+        if student["Name"].lower() == delete_student.lower():
             students.remove(student)
+            save_students()
             print("Student removed successfully")
             found = True
 
@@ -122,12 +133,29 @@ def delete_students():
 
     # Display message if student was not found
     if not found:
-        print(f"The student {delete_student} could not be found \n")
+        print(f"The student {delete_student} could not be found. \n")
+
+# Function updates the student's major if they want to change
+def update_students():
+    found = False
+
+    update_name = input("What is the name of the student whose major you want to update? ")
+
+    for student in students:
+        if student["Name"].lower() == update_name.lower():
+            new_major = input("What is the student's new major? ")
+            student["Major"] = new_major
+            print("Student updated successfully \n")
+
+            found = True
+            save_students()
+
+            break
+    if not found:
+        print(f"The student {update_name} could not be found. \n")
 
 print()
 
-# Resets memory
-students.clear()
 
 # Runs load_student function
 load_students()
@@ -140,7 +168,8 @@ while True:
     print("2. View Students")
     print("3. Search Students")
     print("4. Delete Students")
-    print("5. Exit \n")
+    print("5. Update Students")
+    print("6. Exit \n")
 
     # Get user menu selection
     choice = input("Choose an option: ")
@@ -159,9 +188,12 @@ while True:
 
     elif choice == "4":
         delete_students()
+    
+    elif choice == "5":
+        update_students()
 
     # Exit application
-    elif choice == "5":
+    elif choice == "6":
         break
 
     # Handle invalid menu input
